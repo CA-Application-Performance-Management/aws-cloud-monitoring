@@ -86,13 +86,13 @@ Uploading to AWS Lambda
     
 *   Click **Create Function** → **Author from Scratch**.
     
-*   **Runtime**: Choose **Java 11 or Java 17**.
+*   **Runtime**: Choose **Java 8 or later**.
     
 *   com.yourcompany.GlueCustomMetricsLambda::handleRequest
     
 *   **Upload JAR File**: Choose the jar-with-dependencies.jar generated above.
 
-**Note:** Please ensure to change the AWS Lambda function timeout to 30 seconds (default is 15 seconds) to ensure sufficient execution time.
+**Note:** Please ensure to change the AWS Lambda function timeout to 30 seconds or more (default is 15 seconds) to ensure sufficient execution time.
     
 
 If you prefer command-line deployment:
