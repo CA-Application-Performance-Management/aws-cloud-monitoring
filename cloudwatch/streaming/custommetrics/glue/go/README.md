@@ -43,7 +43,7 @@ The following IAM policy permissions are required for the Lambda function to ope
       "Resource": "*"
     }
   ]
-}  `
+}
 
 ```
 Steps to Build and Deploy Lambda Executable
@@ -54,7 +54,9 @@ To build an executable for AWS Lambda on your local machine:
 1.  **Build the executable** using the command below in a Git Bash terminal (or similar):
     
 
-`      GOOS=linux GOARCH=arm64 go build -o bootstrap lambda.go   `
+``` bash
+     GOOS=linux GOARCH=arm64 go build -o bootstrap lambda.go
+```	 
 
 1.  **Package the executable**:
     

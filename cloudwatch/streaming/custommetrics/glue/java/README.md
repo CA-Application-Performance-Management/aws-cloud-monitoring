@@ -43,7 +43,7 @@ The following IAM policy permissions are required for the Lambda function to ope
       "Resource": "*"
     }
   ]
-}  `
+}
 
 ```
 Prerequisites
@@ -66,13 +66,13 @@ Building & Packaging the Lambda Function
 To compile and package the Lambda function as a deployable JAR:
 
 ``` bash
-  mvn clean package   `
+  mvn clean package
 ```
 
 This will generate a JAR file with all dependencies at:
 
 ``` bash
-target/glue-custom-metrics-lambda-1.0.0-jar-with-dependencies.jar   `
+target/glue-custom-metrics-lambda-1.0.0-jar-with-dependencies.jar
 ```
 
 Uploading to AWS Lambda
