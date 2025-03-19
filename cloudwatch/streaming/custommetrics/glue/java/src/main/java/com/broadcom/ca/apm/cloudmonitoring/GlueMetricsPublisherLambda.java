@@ -25,6 +25,11 @@ public class GlueMetricsPublisherLambda
     private static final String AWS_GLUE_JOB_LATEST_RUN_START_TIME_EPOCH_CUSTOM_METRIC_NAME = "Latest Run Start Time (Epoch)";
     private static final String AWS_GLUE_JOB_LATEST_RUN_COMPLETION_TIME_EPOCH_CUSTOM_METRIC_NAME = "Latest Run Completion Time (Epoch)";
     private static final String AWS_GLUE_JOB_LATEST_RUN_ERROR_STATE_CUSTOM_METRIC_NAME = "Latest Run Error State";
+    private static final String AWS_GLUE_JOB_RUN_CURRENT_STATE_CUSTOM_METRIC_NAME = "Current Run State";
+    private static final String AWS_GLUE_JOB_RUN_START_TIME_EPOCH_CUSTOM_METRIC_NAME = "Run Start Time (Epoch)";
+    private static final String AWS_GLUE_JOB_RUN_COMPLETION_TIME_EPOCH_CUSTOM_METRIC_NAME = "Run Completion Time (Epoch)";
+    private static final String AWS_GLUE_JOB_RUN_EXECUTION_DURATION_SEC_CUSTOM_METRIC_NAME = "Run Execution Duration (Sec)";
+    private static final String AWS_GLUE_JOB_RUN_ERROR_STATE_CUSTOM_METRIC_NAME = "Run Error State";
 
     public static void main(String[] args) {
         try {
@@ -129,7 +134,8 @@ public class GlueMetricsPublisherLambda
     public static Map<String, List<JobRun>> findTheEligibleCurrentAwsGlueJobRunsToMonitor(GlueClient glueClient, List<String> glueJobNames) {
         Map<String, List<JobRun>> glueJobNameAndEligibleJobRunsMap = new HashMap<>();
         for (String glueJobName : glueJobNames) {
-            List<JobRun> currentGlueJobAllRuns = fetchAllJobRunsOfGlueJob(glueClient, glueJobName);;
+            List<JobRun> currentGlueJobAllRuns = fetchAllJobRunsOfGlueJob(glueClient, glueJobName);
+            ;
 
             List<JobRun> eligibleJobRuns = new ArrayList<>();
             for (JobRun jobRun : currentGlueJobAllRuns) {
@@ -161,24 +167,24 @@ public class GlueMetricsPublisherLambda
                         String glueJobRunErrorMessage = glueJobRun.errorMessage();
 
                         int glueJobRunStateCode = computeAWSGlueJobLatestRunStateMetric(String.valueOf(glueJobRun.jobRunState()));
-                        glueJobRunCustomMetricNameAndValueMap.put("Current Run State", (double) glueJobRunStateCode);
-                        glueJobRunCustomMetricNameAndUnitMap.put("Current Run State", StandardUnit.NONE);
+                        glueJobRunCustomMetricNameAndValueMap.put(AWS_GLUE_JOB_RUN_CURRENT_STATE_CUSTOM_METRIC_NAME, (double) glueJobRunStateCode);
+                        glueJobRunCustomMetricNameAndUnitMap.put(AWS_GLUE_JOB_RUN_CURRENT_STATE_CUSTOM_METRIC_NAME, StandardUnit.NONE);
 
-                        glueJobRunCustomMetricNameAndValueMap.put("Run Start Time (Epoch)", (double) glueJobRun.startedOn().getEpochSecond());
-                        glueJobRunCustomMetricNameAndUnitMap.put("Run Start Time (Epoch)", StandardUnit.SECONDS);
+                        glueJobRunCustomMetricNameAndValueMap.put(AWS_GLUE_JOB_RUN_START_TIME_EPOCH_CUSTOM_METRIC_NAME, (double) glueJobRun.startedOn().getEpochSecond());
+                        glueJobRunCustomMetricNameAndUnitMap.put(AWS_GLUE_JOB_RUN_START_TIME_EPOCH_CUSTOM_METRIC_NAME, StandardUnit.SECONDS);
 
                         if (glueJobRun.completedOn() != null) {
-                            glueJobRunCustomMetricNameAndValueMap.put("Run Completion Time (Epoch)",
+                            glueJobRunCustomMetricNameAndValueMap.put(AWS_GLUE_JOB_RUN_COMPLETION_TIME_EPOCH_CUSTOM_METRIC_NAME,
                                                                       (double) glueJobRun.completedOn().getEpochSecond());
-                            glueJobRunCustomMetricNameAndUnitMap.put("Run Completion Time (Epoch)", StandardUnit.SECONDS);
+                            glueJobRunCustomMetricNameAndUnitMap.put(AWS_GLUE_JOB_RUN_COMPLETION_TIME_EPOCH_CUSTOM_METRIC_NAME, StandardUnit.SECONDS);
                         }
 
-                        glueJobRunCustomMetricNameAndValueMap.put("Run Execution Duration (Sec)", (double) glueJobRun.executionTime());
-                        glueJobRunCustomMetricNameAndUnitMap.put("Run Execution Duration (Sec)", StandardUnit.SECONDS);
+                        glueJobRunCustomMetricNameAndValueMap.put(AWS_GLUE_JOB_RUN_EXECUTION_DURATION_SEC_CUSTOM_METRIC_NAME, (double) glueJobRun.executionTime());
+                        glueJobRunCustomMetricNameAndUnitMap.put(AWS_GLUE_JOB_RUN_EXECUTION_DURATION_SEC_CUSTOM_METRIC_NAME, StandardUnit.SECONDS);
 
                         double hasErrorOccurred = getAWSGlueJobErrorStateCode(glueJobRunErrorMessage);
-                        glueJobRunCustomMetricNameAndValueMap.put("Run Error State", hasErrorOccurred);
-                        glueJobRunCustomMetricNameAndUnitMap.put("Run Error State", StandardUnit.NONE);
+                        glueJobRunCustomMetricNameAndValueMap.put(AWS_GLUE_JOB_RUN_ERROR_STATE_CUSTOM_METRIC_NAME, hasErrorOccurred);
+                        glueJobRunCustomMetricNameAndUnitMap.put(AWS_GLUE_JOB_RUN_ERROR_STATE_CUSTOM_METRIC_NAME, StandardUnit.NONE);
 
                         try {
                             constructGlueCustomMetricMetadataAndPublish(glueJobName, cloudWatchClient, glueJobRunCustomMetricNameAndValueMap,

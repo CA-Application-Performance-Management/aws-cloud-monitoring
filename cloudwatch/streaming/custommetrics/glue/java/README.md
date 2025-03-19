@@ -2,21 +2,24 @@
 Glue Job-Level Custom Metrics Lambda (Java)
 =========================================
 
-This Lambda function, written in Java, retrieves and calculates the following seven custom Glue job-level metrics and publishes them to AWS CloudWatch under the namespace 'Broadcom/AwsCustomMetric':
+This is a comprehensive AWS Lambda function written in Java that retrieves and calculates seven custom Glue job-level metrics and five job run-level 
+metrics, then publishes them to AWS CloudWatch under the namespace 'Broadcom/AwsCustomMetric':
 
+### Glue Job-Level Metrics:
 *   **Execution Count**
-    
 *   **Average Execution Duration (Sec)**
-    
 *   **Latest Run State**
-    
 *   **Latest Run Execution Duration (Sec)**
-    
 *   **Latest Run Start Time (Epoch)**
-    
 *   **Latest Run Completion Time (Epoch)**
-    
 *   **Latest Run Error State**
+
+### Glue Job Run-Level Metrics:
+*   **Current Run State**
+*   **Run Start Time (Epoch)**
+*   **Run Completion Time (Epoch)**
+*   **Run Execution Duration (Sec)**
+*   **Run Error State**
     
 
 Required IAM Permissions
@@ -88,6 +91,8 @@ Uploading to AWS Lambda
 *   com.yourcompany.GlueCustomMetricsLambda::handleRequest
     
 *   **Upload JAR File**: Choose the jar-with-dependencies.jar generated above.
+
+**Note:** Please ensure to change the AWS Lambda function timeout to 30 seconds (default is 15 seconds) to ensure sufficient execution time.
     
 
 If you prefer command-line deployment:

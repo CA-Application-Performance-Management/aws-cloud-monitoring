@@ -1,0 +1,774 @@
+(
+	$allData := $map(records, function($record) {
+		$decodedData := $base64decode($record.data) & '\n'
+	});
+
+	$decodedStreamAllTemp := $join($allData);
+	$decodedStreamAll := $split($decodedStreamAllTemp, "\n");
+
+	$decodedStream := $filter($decodedStreamAll, function($x) {
+		$x
+	});
+
+	$lengthTemp := $filter($decodedStream, function($val) {
+			 $length($val)
+	});
+	$inputStreamArray := $map($lengthTemp, function($val) {        
+		$eval($val)
+	});
+
+    $myDevide := function($v1, $v2) {(
+        $v1 / $v2
+    )};
+    
+    $inputStreamMetricArrayWithAvgStats := $map($inputStreamArray, function($var){
+         $merge([$var, {"value": $merge([$var.value, {
+             "avg": $myDevide($var.value.sum, $var.value.count)
+    }])}])});
+
+    $getFomattedMetricNameForALB := function($nonFormattedmetricName){
+        $nonFormattedmetricName = "ActiveConnectionCount" ? "Active Connection Count" :
+                                    ($nonFormattedmetricName = "AnomalousHostCount" ? "Anomalous Host Count" :
+                                    ($nonFormattedmetricName = "ClientTLSNegotiationErrorCount" ? "Client TLS Negotiation Error Count" :
+                                    ($nonFormattedmetricName = "ConsumedLCUs" ? "Consumed LCUs" :
+                                    ($nonFormattedmetricName = "DesyncMitigationMode_NonCompliant_Request_Count" ? "Desync Mitigation Mode NonCompliant Request Count" :
+                                    ($nonFormattedmetricName = "DroppedInvalidHeaderRequestCount" ? "Dropped Invalid Header Request Count" :
+                                    ($nonFormattedmetricName = "MitigatedHostCount" ? "Mitigated Host Count" :
+                                    ($nonFormattedmetricName = "ForwardedInvalidHeaderRequestCount" ? "Forwarded Invalid Header Request Count" :
+                                    ($nonFormattedmetricName = "GrpcRequestCount" ? "Grpc Request Count" :
+                                    ($nonFormattedmetricName = "HTTP_Fixed_Response_Count" ? "HTTP Fixed Response Count" :
+                                    ($nonFormattedmetricName = "HTTP_Redirect_Count" ? "HTTP Redirect Count" :
+                                    ($nonFormattedmetricName = "HTTP_Redirect_Url_Limit_Exceeded_Count" ? "HTTP Redirect URL Limit Exceeded Count" :
+                                    ($nonFormattedmetricName = "HTTPCode_ELB_3XX_Count" ? "HTTP Code ELB 3XX Count" :
+                                    ($nonFormattedmetricName = "HTTPCode_ELB_4XX_Count" ? "HTTP Code ELB 4XX Count" :
+                                    ($nonFormattedmetricName = "HTTPCode_ELB_5XX_Count" ? "HTTP Code ELB 5XX Count" :
+                                    ($nonFormattedmetricName = "HTTPCode_ELB_500_Count" ? "HTTP Code ELB 500 Count" :
+                                    ($nonFormattedmetricName = "HTTPCode_ELB_502_Count" ? "HTTP Code ELB 502 Count" :
+                                    ($nonFormattedmetricName = "HTTPCode_ELB_503_Count" ? "HTTP Code ELB 503 Count" :
+                                    ($nonFormattedmetricName = "HTTPCode_ELB_504_Count" ? "HTTPCode ELB 504 Count" :
+                                    ($nonFormattedmetricName = "IPv6ProcessedBytes" ? "IPv6 Processed Bytes" :
+                                    ($nonFormattedmetricName = "IPv6RequestCount" ? "IPv6 Request Count" :
+                                    ($nonFormattedmetricName = "NewConnectionCount" ? "New Connection Count" :
+                                    ($nonFormattedmetricName = "NonStickyRequestCount" ? "Non Sticky Request Count" :
+                                    ($nonFormattedmetricName = "ProcessedBytes" ? "Processed Bytes" :
+                                    ($nonFormattedmetricName = "RejectedConnectionCount" ? "Rejected Connection Count" :
+                                    ($nonFormattedmetricName = "RequestCount" ? "Request Count" :
+                                    ($nonFormattedmetricName = "RuleEvaluations" ? "Rule Evaluations" :
+                                    ($nonFormattedmetricName = "HealthyHostCount" ? "Healthy Host Count" :
+                                    ($nonFormattedmetricName = "HTTPCode_Target_2XX_Count" ? "HTTPCode Target 2XX Count" :
+                                    ($nonFormattedmetricName = "HTTPCode_Target_3XX_Count" ? "HTTPCode Target 3XX Count" :
+                                    ($nonFormattedmetricName = "HTTPCode_Target_4XX_Count" ? "HTTPCode Target 4XX Count" :
+                                    ($nonFormattedmetricName = "HTTPCode_Target_5XX_Count" ? "HTTPCode Target 5XX Count" :
+                                    ($nonFormattedmetricName = "RequestCountPerTarget" ? "Request Count Per Target" :
+                                    ($nonFormattedmetricName = "TargetConnectionErrorCount" ? "Target Connection Error Count" :
+                                    ($nonFormattedmetricName = "TargetResponseTime" ? "Target Response Time" :
+                                    ($nonFormattedmetricName = "TargetTLSNegotiationErrorCount" ? "Target TLS Negotiation Error Count" :
+                                    ($nonFormattedmetricName = "UnHealthyHostCount" ? "UnHealthy Host Count" :
+                                    ($nonFormattedmetricName = "HealthyStateDNS" ? "Healthy State DNS" :
+                                    ($nonFormattedmetricName = "HealthyStateRouting" ? "Healthy State Routing" :
+                                    ($nonFormattedmetricName = "UnhealthyRoutingRequestCount" ? "Unhealthy Routing Request Count" :
+                                    ($nonFormattedmetricName = "UnhealthyStateDNS" ? "Unhealthy State DNS" :
+                                    ($nonFormattedmetricName = "UnhealthyStateRouting" ? "Unhealthy State Routing" :
+                                    ($nonFormattedmetricName = "LambdaInternalError" ? "Lambda Internal Error" :
+                                    ($nonFormattedmetricName = "LambdaTargetProcessedBytes" ? "Lambda Target Processed Bytes" :
+                                    ($nonFormattedmetricName = "LambdaUserError" ? "Lambda User Error" :
+                                    ($nonFormattedmetricName = "ELBAuthError" ? "ELB Auth Error" :
+                                    ($nonFormattedmetricName = "ELBAuthFailure" ? "ELB Auth Failure" :
+                                    ($nonFormattedmetricName = "ELBAuthLatency" ? "ELB Auth Latency" :
+                                    ($nonFormattedmetricName = "ELBAuthRefreshTokenSuccess" ? "ELB Auth Refresh Token Success" :
+                                    ($nonFormattedmetricName = "ELBAuthSuccess" ? "ELB Auth Success" :
+                                    ($nonFormattedmetricName = "ELBAuthUserClaimsSizeExceeded" ? "ELB Auth User Claims Size Exceeded" : $nonFormattedmetricName))))))))))))))))))))))))))))))))))))))))))))))))))
+    };
+
+    $getFomattedMetricNameForCLB := function($nonFormattedmetricName){
+        $nonFormattedmetricName = "BackendConnectionErrors" ? "Backend Connection Errors" :
+                                    ($nonFormattedmetricName = "DesyncMitigationMode_NonCompliant_Request_Count" ? "Desync Mitigation Mode Non Compliant Request Count" :
+                                    ($nonFormattedmetricName = "HealthyHostCount" ? "Healthy Host Count" :
+                                    ($nonFormattedmetricName = "HTTPCode_Backend_2XX" ? "HTTP Code Backend 2XX" :
+                                    ($nonFormattedmetricName = "HTTPCode_Backend_3XX" ? "HTTP Code Backend 3XX" :
+                                    ($nonFormattedmetricName = "HTTPCode_Backend_4XX" ? "HTTP Code Backend 4XX" :
+                                    ($nonFormattedmetricName = "HTTPCode_Backend_5XX" ? "HTTP Code Backend 5XX" :
+                                    ($nonFormattedmetricName = "HTTPCode_ELB_4XX" ? "HTTP Code ELB 4XX" :
+                                    ($nonFormattedmetricName = "HTTPCode_ELB_5XX" ? "HTTP Code ELB 5XX" :
+                                    ($nonFormattedmetricName = "Latency" ? "Latency" :
+                                    ($nonFormattedmetricName = "RequestCount" ? "Request Count" :
+                                    ($nonFormattedmetricName = "SpilloverCount" ? "Spillover Count" :
+                                    ($nonFormattedmetricName = "SurgeQueueLength" ? "Surge Queue Length" :                                                                   
+                                    ($nonFormattedmetricName = "UnHealthyHostCount" ? "UnHealthy Host Count" :
+                                    ($nonFormattedmetricName = "EstimatedALBActiveConnectionCount" ? "Estimated ALB Active Connection Count" :
+                                    ($nonFormattedmetricName = "EstimatedALBConsumedLCUs" ? "Estimated ALB Consumed LCUs" :
+                                    ($nonFormattedmetricName = "EstimatedALBNewConnectionCount" ? "Estimated ALB New Connection Count" :
+                                    ($nonFormattedmetricName = "EstimatedProcessedBytes" ? "Estimated Processed Bytes" : $nonFormattedmetricName)))))))))))))))))
+    };
+
+    $getFomattedMetricNameForNLB := function($nonFormattedmetricName){
+        $nonFormattedmetricName = "ActiveFlowCount" ? "Active Flow Count" :
+                                    ($nonFormattedmetricName = "ActiveFlowCount_TCP" ? "Active Flow Count TCP" :
+                                    ($nonFormattedmetricName = "ActiveFlowCount_TLS" ? "Active Flow Count TLS" :
+                                    ($nonFormattedmetricName = "ActiveFlowCount_UDP" ? "Active Flow Count UDP" :
+                                    ($nonFormattedmetricName = "ClientTLSNegotiationErrorCount" ? "Client TLS Negotiation Error Count" :
+                                    ($nonFormattedmetricName = "ConsumedLCUs" ? "Consumed LCUs" :
+                                    ($nonFormattedmetricName = "ConsumedLCUs_TCP" ? "Consumed LCUs TCP" :
+                                    ($nonFormattedmetricName = "ConsumedLCUs_TLS" ? "Consumed LCUs TLS" :
+                                    ($nonFormattedmetricName = "ConsumedLCUs_UDP" ? "Consumed LCUs UDP" :
+                                    ($nonFormattedmetricName = "HealthyHostCount" ? "Healthy Host Count" :
+                                    ($nonFormattedmetricName = "NewFlowCount" ? "New Flow Count" :
+                                    ($nonFormattedmetricName = "NewFlowCount_TCP" ? "New Flow Count TCP" :
+                                    ($nonFormattedmetricName = "NewFlowCount_TLS" ? "New Flow Count TLS" :
+                                    ($nonFormattedmetricName = "NewFlowCount_UDP" ? "New Flow Count UDP" :
+                                    ($nonFormattedmetricName = "PeakPacketsPerSecond" ? "Peak Packets Per Second" :
+                                    ($nonFormattedmetricName = "PortAllocationErrorCount" ? "Port Allocation Error Count" :
+                                    ($nonFormattedmetricName = "ProcessedBytes" ? "Processed Bytes" :
+                                    ($nonFormattedmetricName = "ProcessedBytes_TCP" ? "Processed Bytes TCP" :
+                                    ($nonFormattedmetricName = "ProcessedBytes_TLS" ? "Processed Bytes TLS" :
+                                    ($nonFormattedmetricName = "ProcessedBytes_UDP" ? "Processed Bytes UDP" :
+                                    ($nonFormattedmetricName = "ProcessedPackets" ? "Processed Packets" :
+                                    ($nonFormattedmetricName = "SecurityGroupBlockedFlowCount_Inbound_ICMP" ? "Security Group Blocked Flow Count Inbound ICMP" :
+                                    ($nonFormattedmetricName = "SecurityGroupBlockedFlowCount_Inbound_TCP" ? "Security Group Blocked Flow Count Inbound TCP" :
+                                    ($nonFormattedmetricName = "SecurityGroupBlockedFlowCount_Inbound_UDP" ? "Security Group Blocked Flow Count Inbound UDP" :
+                                    ($nonFormattedmetricName = "SecurityGroupBlockedFlowCount_Outbound_ICMP" ? "Security Group Blocked Flow Count Outbound ICMP" :
+                                    ($nonFormattedmetricName = "SecurityGroupBlockedFlowCount_Outbound_TCP" ? "Security Group Blocked Flow Count Outbound TCP" :
+                                    ($nonFormattedmetricName = "SecurityGroupBlockedFlowCount_Outbound_UDP" ? "Security Group Blocked Flow Count Outbound UDP" :
+                                    ($nonFormattedmetricName = "TargetTLSNegotiationErrorCount" ? "Target TLS Negotiation Error Count" :
+                                    ($nonFormattedmetricName = "TCP_Client_Reset_Count" ? "TCP Client Reset Count" :
+                                    ($nonFormattedmetricName = "TCP_ELB_Reset_Count" ? "TCP ELB Reset Count" :
+                                    ($nonFormattedmetricName = "TCP_Target_Reset_Count" ? "TCP Target Reset Count" : 
+                                    ($nonFormattedmetricName = "UnHealthyHostCount" ? "UnHealthy Host Count" :
+                                    ($nonFormattedmetricName = "ActiveFlowCount_TCP" ? "Unhealthy Routing Flow Count" :                                
+                                    ($nonFormattedmetricName = "ConsumedTCUs" ? "Consumed TCUs" : $nonFormattedmetricName)))))))))))))))))))))))))))))))))
+    };
+
+    $getFomattedMetricNameForGlue := function($nonFormattedmetricName){
+        $nonFormattedmetricName = "glue.ALL.jvm.heap.usage" ? "Glue All JVM Heap Usage (%)" :
+									($nonFormattedmetricName = "glue.ALL.jvm.heap.used" ? "Glue All JVM Heap Used (Bytes)" :
+									($nonFormattedmetricName = "glue.ALL.s3.filesystem.read_bytes" ? "Glue All S3 Filesystem Read Bytes" :
+									($nonFormattedmetricName = "glue.ALL.s3.filesystem.write_bytes" ? "Glue All S3 Filesystem Write Bytes" :
+									($nonFormattedmetricName = "glue.ALL.system.cpuSystemLoad" ? "Glue All System CPU System Load (%)" :
+									($nonFormattedmetricName = "glue.driver.aggregate.bytesRead" ? "Glue Driver Aggregate Bytes Read" :
+									($nonFormattedmetricName = "glue.driver.aggregate.elapsedTime" ? "Glue Driver Aggregate Elapsed Time (ms)" :
+									($nonFormattedmetricName = "glue.driver.aggregate.numCompletedStages" ? "Glue Driver Aggregate Num Completed Stages" :
+									($nonFormattedmetricName = "glue.driver.aggregate.numCompletedTasks" ? "Glue Driver Aggregate Num Completed Tasks" :
+									($nonFormattedmetricName = "glue.driver.aggregate.numKilledTasks" ? "Glue Driver Aggregate Num Killed Tasks" :
+									($nonFormattedmetricName = "glue.driver.aggregate.numFailedTasks" ? "Glue Driver Aggregate Num Failed Tasks" :
+									($nonFormattedmetricName = "glue.driver.aggregate.recordsRead" ? "Glue Driver Aggregate Records Read" :
+									($nonFormattedmetricName = "glue.driver.aggregate.shuffleBytesWritten" ? "Glue Driver Aggregate Shuffle Bytes Written" :
+									($nonFormattedmetricName = "glue.driver.aggregate.shuffleLocalBytesRead" ? "Glue Driver Aggregate Shuffle Local Bytes Read" :
+									($nonFormattedmetricName = "glue.driver.BlockManager.disk.diskSpaceUsed_MB" ? "Glue Driver Block Manager Disk Space Used (MB)" :
+									($nonFormattedmetricName = "glue.driver.ExecutorAllocationManager.executors.numberAllExecutors" ? "Glue Driver Executor Allocation Manager Executors Number All Executors" :
+									($nonFormattedmetricName = "glue.driver.ExecutorAllocationManager.executors.numberMaxNeededExecutors" ? "Glue Driver Executor Allocation Manager Executors Number Max Needed Executors" :
+									($nonFormattedmetricName = "glue.driver.jvm.heap.usage" ? "Glue Driver JVM Heap Usage (%)" :
+									($nonFormattedmetricName = "glue.driver.jvm.heap.used" ? "Glue Driver JVM Heap Used (Bytes)" :
+									($nonFormattedmetricName = "glue.driver.s3.filesystem.read_bytes" ? "Glue Driver S3 Filesystem Read Bytes" :
+									($nonFormattedmetricName = "glue.driver.s3.filesystem.write_bytes" ? "Glue Driver S3 Filesystem Write Bytes" :
+									($nonFormattedmetricName = "glue.driver.system.cpuSystemLoad" ? "Glue Driver System CPU System Load (%)" :
+									($nonFormattedmetricName = "glue.jvm.heap.usage" ? "Glue JVM Heap Usage (%)" :
+									($nonFormattedmetricName = "glue.jvm.heap.used" ? "Glue JVM Heap Used (Bytes)" :
+									($nonFormattedmetricName = "glue.s3.filesystem.read_bytes" ? "Glue S3 Filesystem Read Bytes" :
+									($nonFormattedmetricName = "glue.s3.filesystem.write_bytes" ? "Glue S3 Filesystem Write Bytes" :
+									($nonFormattedmetricName = "glue.system.cpuSystemLoad" ? "Glue System CPU System Load (%)" :
+									($nonFormattedmetricName = "glue.driver.streaming.numRecords" ? "Glue Driver Streaming Num Records" :
+									($nonFormattedmetricName = "glue.driver.streaming.batchProcessingTimeInMs" ? "Glue Driver Streaming Batch Processing Time (ms)" :
+									($nonFormattedmetricName = "glue.driver.aggregate.jvmGCTime" ? "Glue Driver Aggregate JVM GC Time" :
+									($nonFormattedmetricName = "glue.1.s3.filesystem.write_bytes" ? "Glue 1 S3 Filesystem Write Bytes" :
+									($nonFormattedmetricName = "glue.1.system.cpuSystemLoad" ? "Glue 1 System CPU System Load (%)" :
+									($nonFormattedmetricName = "glue.1.jvm.heap.used" ? "Glue 1 JVM Heap Used (Bytes)" :
+									($nonFormattedmetricName = "glue.1.jvm.heap.usage" ? "Glue 1 JVM Heap Usage (%)" :
+									($nonFormattedmetricName = "glue.1.s3.filesystem.read_bytes" ? "Glue 1 S3 Filesystem Read Bytes" : $nonFormattedmetricName))))))))))))))))))))))))))))))))))
+    };
+
+    $getFomattedMetricNameForFSxWin := function($nonFormattedmetricName){
+        $nonFormattedmetricName = "DataReadBytes" ? "Data Read Bytes" :
+                                    ($nonFormattedmetricName = "DataWriteBytes" ? "Data Write Bytes" :
+                                    ($nonFormattedmetricName = "DataWriteOperations" ? "Data Write Operations" :
+                                    ($nonFormattedmetricName = "DataReadOperations" ? "Data Read Operations" :
+                                    ($nonFormattedmetricName = "MetadataOperations" ? "Metadata Operations":
+                                    ($nonFormattedmetricName = "ClientConnections" ? "Client Connections":
+                                    ($nonFormattedmetricName = "NetworkThroughputUtilization" ? "Network Throughput Utilization (%)" :
+                                    ($nonFormattedmetricName = "CPUUtilization" ? "CPU Utilization (%)" :
+                                    ($nonFormattedmetricName = "MemoryUtilization" ? "Memory Utilization (%)" :
+                                    ($nonFormattedmetricName = "FileServerDiskThroughputUtilization" ? "File Server Disk Throughput Utilization (%)" :
+                                    ($nonFormattedmetricName = "FileServerDiskThroughputBalance" ? "File Server Disk Throughput Balance (%)" :
+                                    ($nonFormattedmetricName = "FileServerDiskIopsUtilization" ? "File Server Disk IOPS Utilization (%)" :
+                                    ($nonFormattedmetricName = "FileServerDiskIopsBalance" ? "File Server Disk IOPS Balance (%)" :
+                                    ($nonFormattedmetricName = "FileServerCacheHitRatio" ? "File Server Cache Hit Ratio (%)" :
+                                    ($nonFormattedmetricName = "DiskReadBytes" ? "Disk Read Bytes" :
+                                    ($nonFormattedmetricName = "DiskWriteBytes" ? "Disk Write Bytes" :                                    
+                                    ($nonFormattedmetricName = "DiskReadOperations" ? "Disk Read Operations" :
+                                    ($nonFormattedmetricName = "DiskWriteOperations" ? "Disk Write Operations" :                                    
+                                    ($nonFormattedmetricName = "DiskThroughputUtilization" ? "Disk Throughput Utilization (%)" :
+                                    ($nonFormattedmetricName = "DiskThroughputBalance" ? "Disk Throughput Balance (%)" :
+                                    ($nonFormattedmetricName = "DiskIopsUtilization" ? "Disk IOPS Utilization (%)" :
+                                    ($nonFormattedmetricName = "FreeStorageCapacity" ? "Free Storage Capacity (GiB)" :
+                                    ($nonFormattedmetricName = "StorageCapacityUtilization" ? "Storage Capacity Utilization (%)" :
+                                    ($nonFormattedmetricName = "DeduplicationSavedStorage" ? "Deduplication Saved Storage (B)")))))))))))))))))))))))
+    };
+
+    $getAptMetricValAccToMetricNameForALB := function($formatted_metric_Name, $metricValObj){
+        $formatted_metric_Name = "Active Connection Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Anomalous Host Count" ? $string($metricValObj.avg) :
+                                    ($formatted_metric_Name = "Client TLS Negotiation Error Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Consumed LCUs" ? $string($metricValObj.avg) :
+                                    ($formatted_metric_Name = "Desync Mitigation Mode NonCompliant Request Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Dropped Invalid Header Request Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Mitigated Host Count" ? $string($metricValObj.max) :
+                                    ($formatted_metric_Name = "Forwarded Invalid Header Request Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Grpc Request Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "HTTP Fixed Response Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "HTTP Redirect Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "HTTP Redirect URL Limit Exceeded Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "HTTP Code ELB 3XX Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "HTTP Code ELB 4XX Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "HTTP Code ELB 5XX Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "HTTP Code ELB 500 Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "HTTP Code ELB 502 Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "HTTP Code ELB 503 Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "HTTPCode ELB 504 Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "IPv6 Processed Bytes" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "IPv6 Request Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "New Connection Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Non Sticky Request Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Processed Bytes" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Rejected Connection Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Request Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Rule Evaluations" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Healthy Host Count" ? $string($metricValObj.avg) :
+                                    ($formatted_metric_Name = "HTTPCode Target 2XX Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "HTTPCode Target 3XX Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "HTTPCode Target 4XX Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "HTTPCode Target 5XX Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Request Count Per Target" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Target Connection Error Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Target Response Time" ? $string($metricValObj.avg) :
+                                    ($formatted_metric_Name = "Target TLS Negotiation Error Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "UnHealthy Host Count" ? $string($metricValObj.avg) :
+                                    ($formatted_metric_Name = "Healthy State DNS" ? $string($metricValObj.min) :
+                                    ($formatted_metric_Name = "Healthy State Routing" ? $string($metricValObj.min) :
+                                    ($formatted_metric_Name = "Unhealthy Routing Request Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Unhealthy State DNS" ? $string($metricValObj.min) :
+                                    ($formatted_metric_Name = "Unhealthy State Routing" ? $string($metricValObj.min) :
+                                    ($formatted_metric_Name = "Lambda Internal Error" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Lambda Target Processed Bytes" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Lambda User Error" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "ELB Auth Error" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "ELB Auth Failure" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "ELB Auth Latency" ? $string($metricValObj.avg) :
+                                    ($formatted_metric_Name = "ELB Auth Refresh Token Success" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "ELB Auth Success" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "ELB Auth User Claims Size Exceeded" ? $string($metricValObj.sum) : $string($metricValObj.avg)))))))))))))))))))))))))))))))))))))))))))))))))))
+    };
+
+    $getAptMetricValAccToMetricNameForCLB := function($formatted_metric_Name, $metricValObj){
+        $formatted_metric_Name = "Backend Connection Errors" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Desync Mitigation Mode Non Compliant Request Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Healthy Host Count" ? $string($metricValObj.avg) :
+                                    ($formatted_metric_Name = "HTTP Code Backend 2XX" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "HTTP Code Backend 3XX" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "HTTP Code Backend 4XX" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "HTTP Code Backend 5XX" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "HTTP Code ELB 4XX" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "HTTP Code ELB 5XX" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Latency" ? $string($metricValObj.avg) :
+                                    ($formatted_metric_Name = "Request Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Spillover Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Surge Queue Length" ? $string($metricValObj.max) :                                                                   
+                                    ($formatted_metric_Name = "UnHealthy Host Count" ? $string($metricValObj.avg) :
+                                    ($formatted_metric_Name = "Estimated ALB Active Connection Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Estimated ALB Consumed LCUs" ? $string($metricValObj.avg) :
+                                    ($formatted_metric_Name = "Estimated ALB New Connection Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Estimated Processed Bytes" ? $string($metricValObj.sum) : $string($metricValObj.avg))))))))))))))))))
+    };
+
+    $getAptMetricValAccToMetricNameForNLB := function($formatted_metric_Name, $metricValObj){
+        $formatted_metric_Name = "Active Flow Count" ? $string($metricValObj.avg) :
+                                    ($formatted_metric_Name = "Active Flow Count TCP" ? $string($metricValObj.avg) :
+                                    ($formatted_metric_Name = "Active Flow Count TLS" ? $string($metricValObj.avg) :
+                                    ($formatted_metric_Name = "Active Flow Count UDP" ? $string($metricValObj.avg) :
+                                    ($formatted_metric_Name = "Client TLS Negotiation Error Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Consumed LCUs" ? $string($metricValObj.avg) :
+                                    ($formatted_metric_Name = "Consumed LCUs TCP" ? $string($metricValObj.avg) :
+                                    ($formatted_metric_Name = "Consumed LCUs TLS" ? $string($metricValObj.avg) :
+                                    ($formatted_metric_Name = "Consumed LCUs UDP" ? $string($metricValObj.avg) :
+                                    ($formatted_metric_Name = "Healthy Host Count" ? $string($metricValObj.avg) :
+                                    ($formatted_metric_Name = "New Flow Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "New Flow Count TCP" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "New Flow Count TLS" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "New Flow Count UDP" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Peak Packets Per Second" ? $string($metricValObj.max) :
+                                    ($formatted_metric_Name = "Port Allocation Error Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Processed Bytes" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Processed Bytes TCP" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Processed Bytes TLS" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Processed Bytes UDP" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Processed Packets" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Security Group Blocked Flow Count Inbound ICMP" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Security Group Blocked Flow Count Inbound TCP" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Security Group Blocked Flow Count Inbound UDP" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Security Group Blocked Flow Count Outbound ICMP" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Security Group Blocked Flow Count Outbound TCP" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Security Group Blocked Flow Count Outbound UDP" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Target TLS Negotiation Error Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "TCP Client Reset Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "TCP ELB Reset Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "TCP Target Reset Count" ? $string($metricValObj.sum) : 
+                                    ($formatted_metric_Name = "UnHealthy Host Count" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Unhealthy Routing Flow Count" ? $string($metricValObj.sum) :                                
+                                    ($formatted_metric_Name = "Consumed TCUs" ? $string($metricValObj.avg) : $string($metricValObj.avg))))))))))))))))))))))))))))))))))
+    };
+
+    $getAptMetricValAccToMetricNameForGlue := function($formatted_metric_Name, $metricValObj){
+            $formatted_metric_Name = "Glue All JVM Heap Usage (%)" ? $string($metricValObj.avg) :
+									($formatted_metric_Name = "Glue All JVM Heap Used (Bytes)" ?  $string($metricValObj.avg) :
+									($formatted_metric_Name = "Glue All S3 Filesystem Read Bytes" ?  $string($metricValObj.sum) :
+									($formatted_metric_Name = "Glue All S3 Filesystem Write Bytes" ?  $string($metricValObj.sum) :
+									($formatted_metric_Name = "Glue All System CPU System Load (%)" ?  $string($metricValObj.avg) :
+									($formatted_metric_Name = "Glue Driver Aggregate Bytes Read" ?  $string($metricValObj.sum) :
+									($formatted_metric_Name = "Glue Driver Aggregate Elapsed Time (ms)" ?  $string($metricValObj.sum) :
+									($formatted_metric_Name = "Glue Driver Aggregate Num Completed Stages" ?  $string($metricValObj.sum) : 
+									($formatted_metric_Name = "Glue Driver Aggregate Num Completed Tasks" ?  $string($metricValObj.sum) :
+									($formatted_metric_Name = "Glue Driver Aggregate Num Killed Tasks" ?  $string($metricValObj.sum) :
+									($formatted_metric_Name = "Glue Driver Aggregate Num Failed Tasks" ?  $string($metricValObj.sum) :
+									($formatted_metric_Name = "Glue Driver Aggregate Records Read" ?  $string($metricValObj.sum) :
+									($formatted_metric_Name = "Glue Driver Aggregate Shuffle Bytes Written" ?  $string($metricValObj.sum) :
+									($formatted_metric_Name = "Glue Driver Aggregate Shuffle Local Bytes Read" ?  $string($metricValObj.sum) :
+									($formatted_metric_Name = "Glue Driver Block Manager Disk Space Used (MB)" ?  $string($metricValObj.avg) :
+									($formatted_metric_Name = "Glue Driver Executor Allocation Manager Executors Number All Executors" ?  $string($metricValObj.avg) :
+									($formatted_metric_Name = "Glue Driver Executor Allocation Manager Executors Number Max Needed Executors" ?  $string($metricValObj.max) :
+									($formatted_metric_Name = "Glue Driver JVM Heap Usage (%)" ?  $string($metricValObj.avg) :
+									($formatted_metric_Name = "Glue Driver JVM Heap Used (Bytes)" ?  $string($metricValObj.avg) :
+									($formatted_metric_Name = "Glue Driver S3 Filesystem Read Bytes" ?  $string($metricValObj.sum) :
+									($formatted_metric_Name = "Glue Driver S3 Filesystem Write Bytes" ?  $string($metricValObj.sum) :
+									($formatted_metric_Name = "Glue Driver System CPU System Load (%)" ?  $string($metricValObj.avg) :
+									($formatted_metric_Name = "Glue JVM Heap Usage (%)" ?  $string($metricValObj.avg) :
+									($formatted_metric_Name = "Glue JVM Heap Used (Bytes)" ?  $string($metricValObj.avg) :
+									($formatted_metric_Name = "Glue S3 Filesystem Read Bytes" ?  $string($metricValObj.avg) :
+									($formatted_metric_Name = "Glue S3 Filesystem Write Bytes" ?  $string($metricValObj.avg) :
+									($formatted_metric_Name = "Glue System CPU System Load (%)" ?  $string($metricValObj.avg) :
+									($formatted_metric_Name = "Glue Driver Streaming Num Records" ?  $string($metricValObj.avg) :
+									($formatted_metric_Name = "Glue Driver Streaming Batch Processing Time (ms)" ? $string($metricValObj.avg) :
+									($formatted_metric_Name = "Glue Driver Aggregate JVM GC Time" ? $string($metricValObj.avg) :
+									($formatted_metric_Name = "Glue 1 S3 Filesystem Write Bytes" ? $string($metricValObj.sum) :
+									($formatted_metric_Name = "Glue 1 System CPU System Load (%)" ? $string($metricValObj.avg) :
+									($formatted_metric_Name = "Glue 1 JVM Heap Used (Bytes)" ? $string($metricValObj.avg) :
+									($formatted_metric_Name = "Glue 1 JVM Heap Usage (%)" ? $string($metricValObj.avg) :
+									($formatted_metric_Name = "Glue 1 S3 Filesystem Read Bytes" ? $string($metricValObj.sum) : $string($metricValObj.avg)))))))))))))))))))))))))))))))))))
+    };
+
+    
+    $getAptMetricValAccToMetricNameForFSxWin  := function($formatted_metric_Name, $metricValObj){
+        $formatted_metric_Name = "Data Read Bytes" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Data Write Bytes" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Data Write Operations" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Data Read Operations" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Metadata Operations"? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Client Connections" ? $string($metricValObj.count) :
+                                    ($formatted_metric_Name = "Network Throughput Utilization (%)" ? $string($metricValObj.max) :
+                                    ($formatted_metric_Name = "CPU Utilization (%)" ? $string($metricValObj.max) :
+                                    ($formatted_metric_Name = "Memory Utilization (%)" ? $string($metricValObj.max) :
+                                    ($formatted_metric_Name = "File Server Disk Throughput Utilization (%)" ? $string($metricValObj.max) :
+                                    ($formatted_metric_Name = "File Server Disk Throughput Balance (%)" ? $string($metricValObj.max) :
+                                    ($formatted_metric_Name = "File Server Disk IOPS Utilization (%)" ? $string($metricValObj.max) :
+                                    ($formatted_metric_Name = "File Server Disk IOPS Balance (%)" ? $string($metricValObj.max) :
+                                    ($formatted_metric_Name = "File Server Cache Hit Ratio (%)" ? $string($metricValObj.max) :
+                                    ($formatted_metric_Name = "Disk Read Bytes" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Disk Write Bytes" ? $string($metricValObj.sum) :                                    
+                                    ($formatted_metric_Name = "Disk Read Operations" ? $string($metricValObj.sum) :
+                                    ($formatted_metric_Name = "Disk Write Operations" ? $string($metricValObj.sum) :                                    
+                                    ($formatted_metric_Name = "Disk Throughput Utilization (%)" ? $string($metricValObj.max) :
+                                    ($formatted_metric_Name = "Disk Throughput Balance (%)" ? $string($metricValObj.max) :
+                                    ($formatted_metric_Name = "Disk IOPS Utilization (%)" ? $string($metricValObj.max) :
+                                    ($formatted_metric_Name = "Free Storage Capacity (GiB)" ? $string($metricValObj.avg) :
+                                    ($formatted_metric_Name = "Storage Capacity Utilization (%)" ? $string($metricValObj.max) :
+                                    ($formatted_metric_Name = "Deduplication Saved Storage (B)" ? $string($metricValObj.max): $string($metricValObj.avg))))))))))))))))))))))))
+    };
+
+    $inputStreamMetricArrayWithCorrectMetricNames := $map($inputStreamMetricArrayWithAvgStats, function($var){
+         $merge([$var, {"metric_name": ($var.namespace = "AWS/ApplicationELB" ? $getFomattedMetricNameForALB($var.metric_name) : 
+                                        ($var.namespace = "AWS/ELB" ? $getFomattedMetricNameForCLB($var.metric_name) :
+                                        ($var.namespace = "AWS/NetworkELB" ? $getFomattedMetricNameForNLB($var.metric_name) :
+                                        ($var.namespace = "Glue" ? $getFomattedMetricNameForGlue($var.metric_name):
+                                        ($var.namespace = "AWS/FSx" ? $getFomattedMetricNameForFSxWin($var.metric_name))))))}])});
+
+    $getEntityTypeForGlue := function($element) {
+        $element.dimensions.JobRunId = "ALL" ? "AWS_Glue_ETL_Job" : "AWS_Glue_ETL_Job_Run"
+    };
+    
+    $inputStreamMetricArrayAppendedWithEntityType  := $map($inputStreamMetricArrayWithCorrectMetricNames, function($var){
+    $var.namespace = "Broadcom/AwsCustomMetric" ?  $merge([$var, {"entityType": ($var.dimensions.Namespace = "AWS/ApplicationELB" ? "AWS_ALB" : 
+                                        ($var.dimensions.Namespace = "AWS/ELB" ? "AWS_CLB" :
+                                        ($var.dimensions.Namespace = "AWS/NetworkELB" ? "AWS_NLB" :
+                                        ($var.dimensions.Namespace = "Glue" ? $getEntityTypeForGlue($var):                                        
+                                        ($var.dimensions.Namespace = "AWS/FSx" ? "AWS_FSx" )))))}]) :
+    
+    $var.namespace != "Broadcom/AwsCustomMetric" ?  $merge([$var, {"entityType": ($var.namespace = "AWS/ApplicationELB" ? "AWS_ALB" : 
+                                        ($var.namespace = "AWS/ELB" ? "AWS_CLB" :
+                                        ($var.namespace = "AWS/NetworkELB" ? "AWS_NLB" :
+                                        ($var.namespace = "Glue" ? $getEntityTypeForGlue($var):
+                                        ($var.namespace = "AWS/FSx" ? "AWS_FSx" )))))}])
+                                        });                                    
+
+    $inputStreamMetricArrayAppendedWithResourceName  := $map($inputStreamMetricArrayAppendedWithEntityType, function($var){
+     $merge([$var, {"resourceName": ($var.entityType = "AWS_ALB" ? $substringBefore($substringAfter($var.dimensions.LoadBalancer,'/'),'/') : 
+                                        ($var.entityType = "AWS_CLB" ? $var.dimensions.LoadBalancerName :
+                                        ($var.entityType = "AWS_NLB" ? $substringBefore($substringAfter($var.dimensions.LoadBalancer,'/'),'/') :
+                                        ($var.entityType = "AWS_Glue_ETL_Job" ? $var.dimensions.JobName & "|" & $var.dimensions.JobRunId :
+                                        ($var.entityType = "AWS_Glue_ETL_Job_Run" ? $var.dimensions.JobName & "|" & $var.dimensions.JobRunId:
+                                        ($var.entityType = "AWS_FSx" ? $var.dimensions.FileSystemId))))))}])});
+
+    $getNaasMetricTypeAccToMetricNameForALB := function($formatted_metric_Name){
+        $formatted_metric_Name = "Active Connection Count" ? "Counter" :
+                                    ($formatted_metric_Name = "Anomalous Host Count" ? "Counter" :
+                                    ($formatted_metric_Name = "Client TLS Negotiation Error Count" ? "Counter" :
+                                    ($formatted_metric_Name = "Consumed LCUs" ? "Counter" :
+                                    ($formatted_metric_Name = "Desync Mitigation Mode NonCompliant Request Count" ? "Counter" :
+                                    ($formatted_metric_Name = "Dropped Invalid Header Request Count" ? "Counter" :
+                                    ($formatted_metric_Name = "Mitigated Host Count" ? "Counter" :
+                                    ($formatted_metric_Name = "Forwarded Invalid Header Request Count" ? "Counter" :
+                                    ($formatted_metric_Name = "Grpc Request Count" ? "Counter" :
+                                    ($formatted_metric_Name = "HTTP Fixed Response Count" ? "Counter" :
+                                    ($formatted_metric_Name = "HTTP Redirect Count" ? "Counter" :
+                                    ($formatted_metric_Name = "HTTP Redirect URL Limit Exceeded Count" ? "Counter" :
+                                    ($formatted_metric_Name = "HTTP Code ELB 3XX Count" ? "Counter" :
+                                    ($formatted_metric_Name = "HTTP Code ELB 4XX Count" ? "Counter" :
+                                    ($formatted_metric_Name = "HTTP Code ELB 5XX Count" ? "Counter" :
+                                    ($formatted_metric_Name = "HTTP Code ELB 500 Count" ? "Counter" :
+                                    ($formatted_metric_Name = "HTTP Code ELB 502 Count" ? "Counter" :
+                                    ($formatted_metric_Name = "HTTP Code ELB 503 Count" ? "Counter" :
+                                    ($formatted_metric_Name = "HTTPCode ELB 504 Count" ? "Counter" :
+                                    ($formatted_metric_Name = "IPv6 Processed Bytes" ? "Long" :
+                                    ($formatted_metric_Name = "IPv6 Request Count" ? "Counter" :
+                                    ($formatted_metric_Name = "New Connection Count" ? "Counter" :
+                                    ($formatted_metric_Name = "Non Sticky Request Count" ? "Counter" :
+                                    ($formatted_metric_Name = "Processed Bytes" ? "Long" :
+                                    ($formatted_metric_Name = "Rejected Connection Count" ? "Counter" :
+                                    ($formatted_metric_Name = "Request Count" ? "Counter" :
+                                    ($formatted_metric_Name = "Rule Evaluations" ? "Counter" :
+                                    ($formatted_metric_Name = "Healthy Host Count" ? "Counter" :
+                                    ($formatted_metric_Name = "HTTPCode Target 2XX Count" ? "Counter" :
+                                    ($formatted_metric_Name = "HTTPCode Target 3XX Count" ? "Counter" :
+                                    ($formatted_metric_Name = "HTTPCode Target 4XX Count" ? "Counter" :
+                                    ($formatted_metric_Name = "HTTPCode Target 5XX Count" ? "Counter" :
+                                    ($formatted_metric_Name = "Request Count Per Target" ? "Counter" :
+                                    ($formatted_metric_Name = "Target Connection Error Count" ? "Counter" :
+                                    ($formatted_metric_Name = "Target Response Time" ? "Long" :
+                                    ($formatted_metric_Name = "Target TLS Negotiation Error Count" ? "Counter" :
+                                    ($formatted_metric_Name = "UnHealthy Host Count" ? "Counter" :
+                                    ($formatted_metric_Name = "Healthy State DNS" ? "Counter" :
+                                    ($formatted_metric_Name = "Healthy State Routing" ? "Counter" :
+                                    ($formatted_metric_Name = "Unhealthy Routing Request Count" ? "Counter" :
+                                    ($formatted_metric_Name = "Unhealthy State DNS" ? "Counter" :
+                                    ($formatted_metric_Name = "Unhealthy State Routing" ? "Counter" :
+                                    ($formatted_metric_Name = "Lambda Internal Error" ? "Counter" :
+                                    ($formatted_metric_Name = "Lambda Target Processed Bytes" ? "Long" :
+                                    ($formatted_metric_Name = "Lambda User Error" ? "Counter" :
+                                    ($formatted_metric_Name = "ELB Auth Error" ? "Counter" :
+                                    ($formatted_metric_Name = "ELB Auth Failure" ? "Counter" :
+                                    ($formatted_metric_Name = "ELB Auth Latency" ? "Long" :
+                                    ($formatted_metric_Name = "ELB Auth Refresh Token Success" ? "Counter" :
+                                    ($formatted_metric_Name = "ELB Auth Success" ? "Counter" :
+                                    ($formatted_metric_Name = "ELB Auth User Claims Size Exceeded" ? "Counter" : "Long" ))))))))))))))))))))))))))))))))))))))))))))))))))
+    };
+
+    $getNaasMetricTypeAccToMetricNameForCLB := function($formatted_metric_Name){
+        $formatted_metric_Name = "Backend Connection Errors" ? "Counter" :
+                                    ($formatted_metric_Name = "Desync Mitigation Mode Non Compliant Request Count" ? "Counter" :
+                                    ($formatted_metric_Name = "Healthy Host Count" ? "Counter" :
+                                    ($formatted_metric_Name = "HTTP Code Backend 2XX" ? "Counter" :
+                                    ($formatted_metric_Name = "HTTP Code Backend 3XX" ? "Counter" :
+                                    ($formatted_metric_Name = "HTTP Code Backend 4XX" ? "Counter" :
+                                    ($formatted_metric_Name = "HTTP Code Backend 5XX" ? "Counter" :
+                                    ($formatted_metric_Name = "HTTP Code ELB 4XX" ? "Counter" :
+                                    ($formatted_metric_Name = "HTTP Code ELB 5XX" ? "Counter" :
+                                    ($formatted_metric_Name = "Latency" ? "Long" :
+                                    ($formatted_metric_Name = "Request Count" ? "Counter" :
+                                    ($formatted_metric_Name = "Spillover Count" ? "Counter" :
+                                    ($formatted_metric_Name = "Surge Queue Length" ? "Long" :                                                                   
+                                    ($formatted_metric_Name = "UnHealthy Host Count" ? "Counter" :
+                                    ($formatted_metric_Name = "Estimated ALB Active Connection Count" ? "Counter" :
+                                    ($formatted_metric_Name = "Estimated ALB Consumed LCUs" ? "Counter" :
+                                    ($formatted_metric_Name = "Estimated ALB New Connection Count" ? "Counter" :
+                                    ($formatted_metric_Name = "Estimated Processed Bytes" ? "Long" : "Long" )))))))))))))))))
+    };
+
+    $getNaasMetricTypeAccToMetricNameForNLB := function($formatted_metric_Name){
+        $formatted_metric_Name = "Active Flow Count" ? "Counter" :
+                                    ($formatted_metric_Name = "Active Flow Count TCP" ? "Counter" :
+                                    ($formatted_metric_Name = "Active Flow Count TLS" ? "Counter" :
+                                    ($formatted_metric_Name = "Active Flow Count UDP" ? "Counter" :
+                                    ($formatted_metric_Name = "Client TLS Negotiation Error Count" ? "Counter" :
+                                    ($formatted_metric_Name = "Consumed LCUs" ? "Counter" :
+                                    ($formatted_metric_Name = "Consumed LCUs TCP" ? "Counter" :
+                                    ($formatted_metric_Name = "Consumed LCUs TLS" ? "Counter" :
+                                    ($formatted_metric_Name = "Consumed LCUs UDP" ? "Counter" :
+                                    ($formatted_metric_Name = "Healthy Host Count" ? "Counter" :
+                                    ($formatted_metric_Name = "New Flow Count" ? "Counter" :
+                                    ($formatted_metric_Name = "New Flow Count TCP" ? "Counter" :
+                                    ($formatted_metric_Name = "New Flow Count TLS" ? "Counter" :
+                                    ($formatted_metric_Name = "New Flow Count UDP" ? "Counter" :
+                                    ($formatted_metric_Name = "Peak Packets Per Second" ? "IntervalCounter" :
+                                    ($formatted_metric_Name = "Port Allocation Error Count" ? "Counter" :
+                                    ($formatted_metric_Name = "Processed Bytes" ? "Long" :
+                                    ($formatted_metric_Name = "Processed Bytes TCP" ? "Long" :
+                                    ($formatted_metric_Name = "Processed Bytes TLS" ? "Long" :
+                                    ($formatted_metric_Name = "Processed Bytes UDP" ? "Long" :
+                                    ($formatted_metric_Name = "Processed Packets" ? "Counter" :
+                                    ($formatted_metric_Name = "Security Group Blocked Flow Count Inbound ICMP" ? "Counter" :
+                                    ($formatted_metric_Name = "Security Group Blocked Flow Count Inbound TCP" ? "Counter" :
+                                    ($formatted_metric_Name = "Security Group Blocked Flow Count Inbound UDP" ? "Counter" :
+                                    ($formatted_metric_Name = "Security Group Blocked Flow Count Outbound ICMP" ? "Counter" :
+                                    ($formatted_metric_Name = "Security Group Blocked Flow Count Outbound TCP" ? "Counter" :
+                                    ($formatted_metric_Name = "Security Group Blocked Flow Count Outbound UDP" ? "Counter" :
+                                    ($formatted_metric_Name = "Target TLS Negotiation Error Count" ? "Counter" :
+                                    ($formatted_metric_Name = "TCP Client Reset Count" ? "Counter" :
+                                    ($formatted_metric_Name = "TCP ELB Reset Count" ? "Counter" :
+                                    ($formatted_metric_Name = "TCP Target Reset Count" ? "Counter" : 
+                                    ($formatted_metric_Name = "UnHealthy Host Count" ? "Counter" :
+                                    ($formatted_metric_Name = "Unhealthy Routing Flow Count" ? "Counter" :                                
+                                    ($formatted_metric_Name = "Consumed TCUs" ? "Counter" : "Long" )))))))))))))))))))))))))))))))))
+    };
+
+    $getNaasMetricTypeAccToMetricNameForGlue := function($formatted_metric_Name){
+            $formatted_metric_Name = "Glue All JVM Heap Usage (%)" ? "Percentage" :
+									($formatted_metric_Name = "Glue All JVM Heap Used (Bytes)" ? "Long" :
+									($formatted_metric_Name = "Glue All S3 Filesystem Read Bytes" ? "Long" :
+									($formatted_metric_Name = "Glue All S3 Filesystem Write Bytes" ? "Long" :
+									($formatted_metric_Name = "Glue All System CPU System Load (%)" ? "Percentage"  :
+									($formatted_metric_Name = "Glue Driver Aggregate Bytes Read" ? "Long" :
+									($formatted_metric_Name = "Glue Driver Aggregate Elapsed Time (ms)" ? "Duration" :
+									($formatted_metric_Name = "Glue Driver Aggregate Num Completed Stages" ? "Counter" : 
+									($formatted_metric_Name = "Glue Driver Aggregate Num Completed Tasks" ? "Counter" :
+									($formatted_metric_Name = "Glue Driver Aggregate Num Killed Tasks" ? "Counter" :
+									($formatted_metric_Name = "Glue Driver Aggregate Num Failed Tasks" ? "Counter" :
+									($formatted_metric_Name = "Glue Driver Aggregate Records Read" ? "Counter" :
+									($formatted_metric_Name = "Glue Driver Aggregate Shuffle Bytes Written" ? "Long"  :
+									($formatted_metric_Name = "Glue Driver Aggregate Shuffle Local Bytes Read" ? "Long"  :
+									($formatted_metric_Name = "Glue Driver Block Manager Disk Space Used (MB)" ? "Long"  :
+									($formatted_metric_Name = "Glue Driver Executor Allocation Manager Executors Number All Executors" ? "Counter" :
+									($formatted_metric_Name = "Glue Driver Executor Allocation Manager Executors Number Max Needed Executors" ? "Counter" :
+									($formatted_metric_Name = "Glue Driver JVM Heap Usage (%)" ? "Percentage" :
+									($formatted_metric_Name = "Glue Driver JVM Heap Used (Bytes)" ? "Long" :
+									($formatted_metric_Name = "Glue Driver S3 Filesystem Read Bytes" ? "Long"  :
+									($formatted_metric_Name = "Glue Driver S3 Filesystem Write Bytes" ? "Long" :
+									($formatted_metric_Name = "Glue Driver System CPU System Load (%)" ? "Percentage" :
+									($formatted_metric_Name = "Glue JVM Heap Usage (%)" ? "Percentage"  :
+									($formatted_metric_Name = "Glue JVM Heap Used (Bytes)" ? "Long" :
+									($formatted_metric_Name = "Glue S3 Filesystem Read Bytes" ? "Long" :
+									($formatted_metric_Name = "Glue S3 Filesystem Write Bytes" ? "Long" :
+									($formatted_metric_Name = "Glue System CPU System Load (%)" ? "Percentage" :
+									($formatted_metric_Name = "Glue Driver Streaming Num Records" ? "Counter" :
+									($formatted_metric_Name = "Glue Driver Streaming Batch Processing Time (ms)" ? "Duration"  :
+									($formatted_metric_Name = "Glue Driver Aggregate JVM GC Time" ? "Duration" :
+									($formatted_metric_Name = "Glue 1 S3 Filesystem Write Bytes" ?"Long"  :
+									($formatted_metric_Name = "Glue 1 System CPU System Load (%)" ? "Percentage" :
+									($formatted_metric_Name = "Glue 1 JVM Heap Used (Bytes)" ?"Long" :
+									($formatted_metric_Name = "Glue 1 JVM Heap Usage (%)" ? "Percentage" :
+									($formatted_metric_Name = "Glue 1 S3 Filesystem Read Bytes" ? "Long" : "Long" ))))))))))))))))))))))))))))))))))
+    };
+
+    $getNaasMetricTypeAccToMetricNameForFSxWin  := function($formatted_metric_Name){
+        $formatted_metric_Name = "Data Read Bytes" ? "Long" :
+                                    ($formatted_metric_Name = "Data Write Bytes" ? "Long" :
+                                    ($formatted_metric_Name = "Data Write Operations" ? "Counter" :
+                                    ($formatted_metric_Name = "Data Read Operations" ? "Counter" :
+                                    ($formatted_metric_Name = "Metadata Operations"? "Counter" :
+                                    ($formatted_metric_Name = "Client Connections" ? "Counter" :
+                                    ($formatted_metric_Name = "Network Throughput Utilization (%)" ? "Percentage" :
+                                    ($formatted_metric_Name = "CPU Utilization (%)" ? "Percentage" :
+                                    ($formatted_metric_Name = "Memory Utilization (%)" ? "Percentage" :
+                                    ($formatted_metric_Name = "File Server Disk Throughput Utilization (%)" ? "Percentage" :
+                                    ($formatted_metric_Name = "File Server Disk Throughput Balance (%)" ? "Percentage" :
+                                    ($formatted_metric_Name = "File Server Disk IOPS Utilization (%)" ? "Percentage" :
+                                    ($formatted_metric_Name = "File Server Disk IOPS Balance (%)" ? "Percentage" :
+                                    ($formatted_metric_Name = "File Server Cache Hit Ratio (%)" ? "Percentage" :
+                                    ($formatted_metric_Name = "Disk Read Bytes" ? "Long" :
+                                    ($formatted_metric_Name = "Disk Write Bytes" ? "Long" :                                    
+                                    ($formatted_metric_Name = "Disk Read Operations" ? "Counter" :
+                                    ($formatted_metric_Name = "Disk Write Operations" ? "Counter" :                                    
+                                    ($formatted_metric_Name = "Disk Throughput Utilization (%)" ? "Percentage" :
+                                    ($formatted_metric_Name = "Disk Throughput Balance (%)" ? "Percentage" :
+                                    ($formatted_metric_Name = "Disk IOPS Utilization (%)" ? "Percentage" :
+                                    ($formatted_metric_Name = "Free Storage Capacity (GiB)" ? "Long" :
+                                    ($formatted_metric_Name = "Storage Capacity Utilization (%)" ? "Percentage" :
+                                    ($formatted_metric_Name = "Deduplication Saved Storage (B)" ? "Long" : "Long" )))))))))))))))))))))))
+    };
+
+    $getNaasMetricTypeAccToMetricNameAndEntityType := function($entityType, $metricName) {
+        $entityType = "AWS_ALB" ? $getNaasMetricTypeAccToMetricNameForALB($metricName) :
+        $entityType = "AWS_CLB" ? $getNaasMetricTypeAccToMetricNameForCLB($metricName) :
+        $entityType = "AWS_NLB" ? $getNaasMetricTypeAccToMetricNameForNLB($metricName) :
+        $entityType = "AWS_Glue_ETL_Job" ? $getNaasMetricTypeAccToMetricNameForGlue($metricName) :
+        $entityType = "AWS_Glue_ETL_Job_Run" ? $getNaasMetricTypeAccToMetricNameForGlue($metricName) :
+        $entityType = "AWS_FSx" ? $getNaasMetricTypeAccToMetricNameForFSxWin($metricName)
+    };
+
+    $getFirstArrElement := function($inputArray) {
+    $exists($inputArray) ? $inputArray[0]
+    };
+
+    $getAccountEntity := function() {
+        ($inputStreamMetricArrayAppendedWithResourceName).{
+            "externalId": "INFRASTRUCTURE::AWS Account:" & account_id,
+            "entityId": "AWS Account:" & account_id,
+            "entityType": "AWS_Account",
+            "entityName": account_id,
+            "configuration_item_type": "AWS_Account",
+			"additionalAttributes":
+			{
+				"AWS_Account": account_id,
+                "AWS_CloudWatch_Metric_Stream": metric_stream_name
+			}
+    }};
+
+    $getRegionEntity := function() {
+        ($inputStreamMetricArrayAppendedWithResourceName).{
+        "externalId": "INFRASTRUCTURE::AWS Region:" & account_id & ":" & region,
+        "entityId": "AWS Region:" & account_id & ":" & region,
+        "entityType": "AWS_Region",
+        "entityName": region,
+        "configuration_item_type": "AWS_Region",
+        "additionalAttributes":
+        {
+            "AWS_Account": account_id,
+            "AWS_Region": region,
+            "AWS_CloudWatch_Metric_Stream": metric_stream_name
+        }        
+    }};
+    
+    $constructNodeId := function($entityType) {
+        $entityType = "AWS_ALB" ? "elasticloadbalancing" :
+        ($entityType = "AWS_CLB" ? "elasticloadbalancing" :
+        ($entityType = "AWS_NLB" ? "elasticloadbalancing" :
+        ($entityType = "AWS_Glue_ETL_Job" ? "glue" :
+        ($entityType = "AWS_Glue_ETL_Job_Run" ? "glue":
+        ($entityType = "AWS_FSx" ? "fsx")))))
+    };
+
+    $getServiceEntity := function() {
+        ($inputStreamMetricArrayAppendedWithResourceName).{
+        "externalId": "INFRASTRUCTURE::AWS Service Type:" & account_id & ":" & region & ":" & $constructNodeId(entityType),
+        "entityId": "AWS Service Type:" & account_id & ":" & region & ":" & $constructNodeId(entityType),
+        "entityType": "AWS Service Type",
+        "entityName": $constructNodeId(entityType),        
+        "configuration_item_type": "AWS Service Type",
+        "additionalAttributes":
+        {
+            "AWS_Account": account_id,
+            "AWS_Region": region,
+            "AWS_CloudWatch_Metric_Stream": metric_stream_name
+        }
+    }};
+
+    $getResourceNameForResourceNodes := function($entityType, $resourceName) {
+        $entityType = "AWS_Glue_ETL_Job" ? $substringBefore($resourceName, "|") :
+        $entityType = "AWS_Glue_ETL_Job_Run" ? $substringBefore($resourceName, "|") : $resourceName
+    };
+
+    $getParentEntities := function() {
+    $append([$distinct($getAccountEntity())],$append([$distinct($getRegionEntity())], [$distinct($getServiceEntity())]))
+    };
+
+    $getAccountRegRel := $map($distinct($getRegionEntity()), function($regEntity) {
+    {
+        "fromExternalId": "INFRASTRUCTURE::AWS Account:" & $regEntity.additionalAttributes.AWS_Account,
+        "toExternalId": "INFRASTRUCTURE::" & $regEntity.entityId
+    }});
+
+    $getRegSrvRel :=  $map($distinct($getServiceEntity()), function($servEntity) {
+    {
+        "fromExternalId": "INFRASTRUCTURE::AWS Region:" & $servEntity.additionalAttributes.AWS_Account & ":" & $servEntity.additionalAttributes.AWS_Region,
+        "toExternalId": "INFRASTRUCTURE::" & $servEntity.entityId
+    }});
+    
+    $getParentRels := function() {
+        $append([$distinct($getAccountRegRel)],[$distinct($getRegSrvRel)])
+    };
+
+    $getMetricValueAccToEntityTypeAndMetricName := function($entityType, $metric_name, $value) {
+           $entityType = "AWS_ALB" ? $getAptMetricValAccToMetricNameForALB($metric_name,$value) : 
+                        ($entityType = "AWS_CLB" ? $getAptMetricValAccToMetricNameForCLB($metric_name,$value) :
+                        ($entityType = "AWS_NLB" ? $getAptMetricValAccToMetricNameForNLB($metric_name,$value) :
+                        ($entityType = "AWS_Glue_ETL_Job" ? $getAptMetricValAccToMetricNameForGlue($metric_name,$value):
+                        ($entityType = "AWS_Glue_ETL_Job_Run" ? $getAptMetricValAccToMetricNameForGlue($metric_name,$value):
+                        ($entityType = "AWS_FSx" ? $getAptMetricValAccToMetricNameForFSxWin($metric_name,$value))))))
+    };
+
+    $getResourceNameForEntityIdForMetrics := function($entityType, $resourceName) {
+        $entityType = "AWS_Glue_ETL_Job" ? $substringBefore($resourceName, "|") :
+        $entityType = "AWS_Glue_ETL_Job_Run" ? $substringBefore($resourceName, "|") : $resourceName
+    };
+
+    $constructMetricHierarchyAccToEntityType := function($entityType) {
+        $entityType = "AWS_ALB" ? "|ELB|Application Load Balancer|" :
+        $entityType = "AWS_CLB" ? "|ELB|Classic Load Balancer|" :
+        $entityType = "AWS_NLB" ? "|ELB|Network Load Balancer|" :
+        $entityType = "AWS_Glue_ETL_Job" ? "|Glue|ETL Jobs|" :
+        $entityType = "AWS_Glue_ETL_Job_Run" ? "|Glue|ETL Jobs|":
+        $entityType = "AWS_FSx" ? "|FSx|Windows|"
+    };
+
+    $getResourceNameForMetricHierarchy := function($entityType, $resourceName, $namespace) {
+        $namespace = "Broadcom/AwsCustomMetric" and $entityType = "AWS_Glue_ETL_Job" ? $substringBefore($resourceName, "|") & "|Job Runs|" & $substringAfter($resourceName, "|") & "|Job Execution Stats" :
+        $namespace = "Glue" and $entityType = "AWS_Glue_ETL_Job" ? $substringBefore($resourceName, "|") & "|Job Runs|" & $substringAfter($resourceName, "|") :
+        $entityType = "AWS_Glue_ETL_Job_Run" ? $substringBefore($resourceName, "|") & "|Job Runs|" & $substringAfter($resourceName, "|") : $resourceName
+    };
+
+    $getEntityTypeForMetricExternalId := function($entityType) {        
+        $entityType = "AWS_Glue_ETL_Job_Run" ? "AWS_Glue_ETL_Job" : $entityType
+    };
+
+    $getAttributeNameAccToEntityType := function($entityType) {
+        $entityType = "AWS_ALB" ? "AWS_ALB_LoadBalancerName" :
+        $entityType = "AWS_CLB" ? "AWS_CLB_LoadBalancerName":
+        $entityType = "AWS_NLB" ? "AWS_NLB_LoadBalancerName" :
+        $entityType = "AWS_Glue_ETL_Job" ? "AWS_Glue_ETL_Job_Name" :
+        $entityType = "AWS_FSx" ? "AWS_FSx_FileSystemId"
+    };
+
+    $getAWSRegionAvailabilityZoneMetricHierarchyIfApplicable := function($dimensions){
+        $length($trim($dimensions.AvailabilityZone)) > 0 ? "|Availability Zone|" & $dimensions.AvailabilityZone
+    };
+
+    $getELBTargetGroupMetricHierarchyIfApplicable := function($dimensions){
+        $length($trim($dimensions.TargetGroup)) > 0 ? "|Target Group|" & $substringBefore($substringAfter($dimensions.TargetGroup, '/'), '/')
+    };
+
+{
+"entities":$append($getParentEntities(), $distinct($inputStreamMetricArrayAppendedWithResourceName.(entityType != "AWS_Glue_ETL_Job_Run" ? 
+      {
+        "externalId": "INFRASTRUCTURE::" & entityType & ":" & account_id & ":" & region & ":" & $constructNodeId(entityType) & ":" & $getResourceNameForResourceNodes(entityType,resourceName),
+        "entityId":  entityType & ":" & account_id & ":" & region & ":" & $constructNodeId(entityType) & ":" & $getResourceNameForResourceNodes(entityType,resourceName),
+        "entityName": $getResourceNameForResourceNodes(entityType,resourceName),
+        "entityType": entityType,
+        "additionalAttributes": {
+           "AWS_Account" : account_id,
+           "AWS_Region": region,
+           $getAttributeNameAccToEntityType(entityType): $getResourceNameForResourceNodes(entityType,resourceName),
+           "AWS_CloudWatch_Metric_Stream": metric_stream_name,
+           "dimensions": dimensions,
+           "dimensionCount": $count($keys(dimensions))
+        },
+        "configuration_item_type": entityType
+      }))),
+
+"relations": $append($getParentRels(), $filter($distinct($inputStreamMetricArrayAppendedWithResourceName.(entityType != "AWS_Glue_ETL_Job_Run" ?  
+      {
+        "fromExternalId": "INFRASTRUCTURE::" & "AWS Service Type:" & account_id & ":" & region & ":" & $constructNodeId(entityType),
+        "toExternalId": "INFRASTRUCTURE::" & entityType & ":" & account_id & ":" & region & ":" & $constructNodeId(entityType) & ":" & $getResourceNameForResourceNodes(entityType,resourceName)
+      })), function($relation) {
+        $exists($relation.toExternalId)
+      })),
+        
+        "metrics": $distinct($inputStreamMetricArrayAppendedWithResourceName.{
+        "timeStamp": $string(timestamp),       
+        "metricName": metric_name,
+        "metricDataType": $getNaasMetricTypeAccToMetricNameAndEntityType(entityType,metric_name),
+        "entityId": $getEntityTypeForMetricExternalId(entityType) & ":" & account_id & ":" & region & ":" & $constructNodeId(entityType) & ":" & $getResourceNameForEntityIdForMetrics(entityType,resourceName),
+        "entityType": $getEntityTypeForMetricExternalId(entityType),
+        "externalId": "INFRASTRUCTURE::" & $getEntityTypeForMetricExternalId(entityType) & ":" & account_id & ":" & region & ":" & $constructNodeId(entityType) & ":" & $getResourceNameForResourceNodes(entityType,resourceName),
+        "entityName": resourceName,
+        "monitoredEntityPath":  "AWS|Account|" & account_id & "|Region|" & region & $constructMetricHierarchyAccToEntityType(entityType) & $getResourceNameForMetricHierarchy(entityType,resourceName,namespace) & $getAWSRegionAvailabilityZoneMetricHierarchyIfApplicable(dimensions) & $getELBTargetGroupMetricHierarchyIfApplicable(dimensions),
+        "monitoringType": "INFRASTRUCTURE",        
+        "metricUnit": unit,
+        "metricValue":  $getMetricValueAccToEntityTypeAndMetricName(entityType,metric_name,value)
+      })
+}
+)
