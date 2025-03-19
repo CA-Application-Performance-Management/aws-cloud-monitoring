@@ -2,7 +2,7 @@
 Glue Job-Level Custom Metrics Lambda (Java)
 =========================================
 
-This Lambda function, written in Java, retrieves and calculates the following seven custom Glue job-level metrics and publishes them to AWS CloudWatch under the namespace 'Broadcom/GlueJobCustomMetric':
+This Lambda function, written in Java, retrieves and calculates the following seven custom Glue job-level metrics and publishes them to AWS CloudWatch under the namespace 'Broadcom/AwsCustomMetric':
 
 *   **Execution Count**
     
