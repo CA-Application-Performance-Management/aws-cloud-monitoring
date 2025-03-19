@@ -8,7 +8,7 @@ Contents
 
 *   **Lambda-based Metric Collection**: Examples demonstrating how AWS Lambda functions can capture and forward custom metrics directly to CloudWatch Metric Streams.
     
-*   **Service-specific Metrics**: Samples tailored to specific AWS services, such as Glue, EC2, and S3, highlighting best practices for capturing additional metrics relevant to these services.
+*   **Service-specific Metrics**: Samples tailored to specific AWS services, such as Glue, for capturing additional metrics relevant to the service(s).
     
 *   **Custom Metric Enhancements**: Techniques for enriching metrics with extra context or dimensions, providing deeper operational insights and clarity.
     
