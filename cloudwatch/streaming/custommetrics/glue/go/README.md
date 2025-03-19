@@ -2,21 +2,24 @@
 Glue Job-Level Custom Metrics Lambda (Go)
 =========================================
 
-This Lambda function, written in Go, retrieves and calculates the following seven custom Glue job-level metrics and publishes them to AWS CloudWatch under the namespace 'Broadcom/AwsCustomMetric':
+This is a comprehensive AWS Lambda function written in Java that retrieves and calculates seven custom Glue job-level metrics and five job run-level
+metrics, then publishes them to AWS CloudWatch under the namespace 'Broadcom/AwsCustomMetric':
 
+### Glue Job-Level Metrics:
 *   **Execution Count**
-    
 *   **Average Execution Duration (Sec)**
-    
 *   **Latest Run State**
-    
 *   **Latest Run Execution Duration (Sec)**
-    
 *   **Latest Run Start Time (Epoch)**
-    
 *   **Latest Run Completion Time (Epoch)**
-    
 *   **Latest Run Error State**
+
+### Glue Job Run-Level Metrics:
+*   **Current Run State**
+*   **Run Start Time (Epoch)**
+*   **Run Completion Time (Epoch)**
+*   **Run Execution Duration (Sec)**
+*   **Run Error State**
     
 
 Required IAM Permissions
@@ -61,10 +64,11 @@ To build an executable for AWS Lambda on your local machine:
 1.  **Package the executable**:
     
 
-*   Zip the generated bootstrap file.
-    
+*  Zip the generated bootstrap file.
 
-1.  **Upload the zip package** to your AWS Lambda function.
+*  **Upload the zip package** to your AWS Lambda function.
+
+**Note:** Please ensure to change the AWS Lambda function timeout to 30 seconds (default is 15 seconds) to ensure sufficient execution time.
     
 
 Steps to Trigger Lambda Using EventBridge
