@@ -54,7 +54,7 @@ Prerequisites
 
 Before building and deploying, ensure you have:
 
-*   **Java 11** or later installed
+*   **Java 8** or later installed
     
 *   **Maven 3.x**
     
