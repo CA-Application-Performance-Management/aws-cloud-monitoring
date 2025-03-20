@@ -2,8 +2,9 @@
 Glue Job-Level Custom Metrics Lambda (Go)
 =========================================
 
-This is a comprehensive AWS Lambda function written in Java that retrieves and calculates seven custom Glue job-level metrics and five job run-level
-metrics, then publishes them to AWS CloudWatch under the namespace 'Broadcom/AwsCustomMetric':
+This is a comprehensive AWS Lambda function written in Go language that retrieves and calculates seven custom Glue job-level metrics and five job 
+run-level
+metrics, then publishes them to AWS CloudWatch under the namespace **'Broadcom/AwsCustomMetric'**:
 
 ### Glue Job-Level Metrics:
 *   **Execution Count**
