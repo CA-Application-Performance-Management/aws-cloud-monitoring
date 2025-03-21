@@ -14,18 +14,20 @@ import (
 	"time"
 )
 
-const AWS_GLUE_JOB_EXECUTION_COUNT_CUSTOM_METRIC_NAME = "Execution Count"
-const AWS_GLUE_JOB_AVG_EXECUTION_DURATION_SEC_CUSTOM_METRIC_NAME = "Average Execution Duration (Sec)"
-const AWS_GLUE_JOB_LATEST_RUN_STATE_CUSTOM_METRIC_NAME = "Latest Run State"
-const AWS_GLUE_JOB_LATEST_RUN_EXEC_DURATION_SEC_CUSTOM_METRIC_NAME = "Latest Run Execution Duration (Sec)"
-const AWS_GLUE_JOB_LATEST_RUN_START_TIME_EPOCH_CUSTOM_METRIC_NAME = "Latest Run Start Time (Epoch)"
-const AWS_GLUE_JOB_LATEST_RUN_COMPLETION_TIME_EPOCH_CUSTOM_METRIC_NAME = "Latest Run Completion Time (Epoch)"
-const AWS_GLUE_JOB_LATEST_RUN_ERROR_STATE_CUSTOM_METRIC_NAME = "Latest Run Error State"
-const AWS_GLUE_JOB_RUN_CURRENT_STATE_CUSTOM_METRIC_NAME = "Current Run State"
-const AWS_GLUE_JOB_RUN_START_TIME_EPOCH_CUSTOM_METRIC_NAME = "Run Start Time (Epoch)"
-const AWS_GLUE_JOB_RUN_COMPLETION_TIME_EPOCH_CUSTOM_METRIC_NAME = "Run Completion Time (Epoch)"
-const AWS_GLUE_JOB_RUN_EXECUTION_DURATION_SEC_CUSTOM_METRIC_NAME = "Run Execution Duration (Sec)"
-const AWS_GLUE_JOB_RUN_ERROR_STATE_CUSTOM_METRIC_NAME = "Run Error State"
+const (
+	AWS_GLUE_JOB_EXECUTION_COUNT_CUSTOM_METRIC_NAME                  = "Execution Count"
+	AWS_GLUE_JOB_AVG_EXECUTION_DURATION_SEC_CUSTOM_METRIC_NAME       = "Average Execution Duration (Sec)"
+	AWS_GLUE_JOB_LATEST_RUN_STATE_CUSTOM_METRIC_NAME                 = "Latest Run State"
+	AWS_GLUE_JOB_LATEST_RUN_EXEC_DURATION_SEC_CUSTOM_METRIC_NAME     = "Latest Run Execution Duration (Sec)"
+	AWS_GLUE_JOB_LATEST_RUN_START_TIME_EPOCH_CUSTOM_METRIC_NAME      = "Latest Run Start Time (Epoch)"
+	AWS_GLUE_JOB_LATEST_RUN_COMPLETION_TIME_EPOCH_CUSTOM_METRIC_NAME = "Latest Run Completion Time (Epoch)"
+	AWS_GLUE_JOB_LATEST_RUN_ERROR_STATE_CUSTOM_METRIC_NAME           = "Latest Run Error State"
+	AWS_GLUE_JOB_RUN_CURRENT_STATE_CUSTOM_METRIC_NAME                = "Current Run State"
+	AWS_GLUE_JOB_RUN_START_TIME_EPOCH_CUSTOM_METRIC_NAME             = "Run Start Time (Epoch)"
+	AWS_GLUE_JOB_RUN_COMPLETION_TIME_EPOCH_CUSTOM_METRIC_NAME        = "Run Completion Time (Epoch)"
+	AWS_GLUE_JOB_RUN_EXECUTION_DURATION_SEC_CUSTOM_METRIC_NAME       = "Run Execution Duration (Sec)"
+	AWS_GLUE_JOB_RUN_ERROR_STATE_CUSTOM_METRIC_NAME                  = "Run Error State"
+)
 
 func main() {
 	lambda.Start(lambdaHandler)
@@ -85,9 +87,9 @@ func calculateAndPublishAwsGlueJobCustomMetricValues(ctx context.Context, awsGlu
 		awsGlueJobRunIdAll := "ALL"
 		var awsGlueJobLatestRunErrorMessage *string
 
-		currentGlueJobAllRuns, err := awsGlueClient.GetJobRuns(ctx, &glue.GetJobRunsInput{JobName: aws.String(awsGlueJobName)})
+		currentGlueJobAllRuns, err := getAllRunsOfTheCurrentJob(ctx, awsGlueClient, awsGlueJobName)
 		if err == nil && currentGlueJobAllRuns != nil {
-			currentAwsGlueJobTotalRunCount = len(currentGlueJobAllRuns.JobRuns)
+			currentAwsGlueJobTotalRunCount = len(currentGlueJobAllRuns)
 			awsGlueJobAverageExecutionDurationSec = computeAwsGlueJobRunsAverageExecutionDuration(currentGlueJobAllRuns, currentAwsGlueJobTotalRunCount)
 
 			awsGlueJobCustomMetricNameAndValueMap[AWS_GLUE_JOB_EXECUTION_COUNT_CUSTOM_METRIC_NAME] = float64(currentAwsGlueJobTotalRunCount)
@@ -96,24 +98,24 @@ func calculateAndPublishAwsGlueJobCustomMetricValues(ctx context.Context, awsGlu
 			awsGlueJobCustomMetricNameAndValueMap[AWS_GLUE_JOB_AVG_EXECUTION_DURATION_SEC_CUSTOM_METRIC_NAME] = float64(awsGlueJobAverageExecutionDurationSec)
 			awsGlueJobCustomMetricNameAndUnitMap[AWS_GLUE_JOB_AVG_EXECUTION_DURATION_SEC_CUSTOM_METRIC_NAME] = types.StandardUnitSeconds
 
-			awsGlueJobLatestRunDetails := currentGlueJobAllRuns.JobRuns[0]
+			awsGlueJobLatestRunDetails := currentGlueJobAllRuns[0]
 			awsGlueJobLatestRunStateCode := computeAWSGlueJobLatestRunStateMetric(awsGlueJobLatestRunDetails.JobRunState)
 			awsGlueJobCustomMetricNameAndValueMap[AWS_GLUE_JOB_LATEST_RUN_STATE_CUSTOM_METRIC_NAME] = float64(awsGlueJobLatestRunStateCode)
 			awsGlueJobCustomMetricNameAndUnitMap[AWS_GLUE_JOB_LATEST_RUN_STATE_CUSTOM_METRIC_NAME] = types.StandardUnitNone
 
-			awsGlueJobCustomMetricNameAndValueMap[AWS_GLUE_JOB_LATEST_RUN_EXEC_DURATION_SEC_CUSTOM_METRIC_NAME] = float64(currentGlueJobAllRuns.JobRuns[0].ExecutionTime)
+			awsGlueJobCustomMetricNameAndValueMap[AWS_GLUE_JOB_LATEST_RUN_EXEC_DURATION_SEC_CUSTOM_METRIC_NAME] = float64(currentGlueJobAllRuns[0].ExecutionTime)
 			awsGlueJobCustomMetricNameAndUnitMap[AWS_GLUE_JOB_LATEST_RUN_EXEC_DURATION_SEC_CUSTOM_METRIC_NAME] = types.StandardUnitSeconds
 
-			awsGlueJobCustomMetricNameAndValueMap[AWS_GLUE_JOB_LATEST_RUN_START_TIME_EPOCH_CUSTOM_METRIC_NAME] = float64(currentGlueJobAllRuns.JobRuns[0].StartedOn.Unix())
+			awsGlueJobCustomMetricNameAndValueMap[AWS_GLUE_JOB_LATEST_RUN_START_TIME_EPOCH_CUSTOM_METRIC_NAME] = float64(currentGlueJobAllRuns[0].StartedOn.Unix())
 			awsGlueJobCustomMetricNameAndUnitMap[AWS_GLUE_JOB_LATEST_RUN_START_TIME_EPOCH_CUSTOM_METRIC_NAME] = types.StandardUnitSeconds
 
-			awsGlueJobRunCompletedOn := currentGlueJobAllRuns.JobRuns[0].CompletedOn
+			awsGlueJobRunCompletedOn := currentGlueJobAllRuns[0].CompletedOn
 			if awsGlueJobRunCompletedOn != nil {
 				awsGlueJobCustomMetricNameAndValueMap[AWS_GLUE_JOB_LATEST_RUN_COMPLETION_TIME_EPOCH_CUSTOM_METRIC_NAME] = float64(awsGlueJobRunCompletedOn.Unix())
 				awsGlueJobCustomMetricNameAndUnitMap[AWS_GLUE_JOB_LATEST_RUN_COMPLETION_TIME_EPOCH_CUSTOM_METRIC_NAME] = types.StandardUnitSeconds
 			}
 
-			awsGlueJobLatestRunErrorMessage = currentGlueJobAllRuns.JobRuns[0].ErrorMessage
+			awsGlueJobLatestRunErrorMessage = currentGlueJobAllRuns[0].ErrorMessage
 			hasErrorOccurred := getAWSGlueJobErrorStateCode(awsGlueJobLatestRunErrorMessage)
 			awsGlueJobCustomMetricNameAndValueMap[AWS_GLUE_JOB_LATEST_RUN_ERROR_STATE_CUSTOM_METRIC_NAME] = hasErrorOccurred
 			awsGlueJobCustomMetricNameAndUnitMap[AWS_GLUE_JOB_LATEST_RUN_ERROR_STATE_CUSTOM_METRIC_NAME] = types.StandardUnitNone
@@ -134,12 +136,12 @@ func findTheEligibleCurrentAwsGlueJobRunsToMonitor(ctx context.Context, awsGlueC
 	var errorMessage error
 	for _, awsGlueJobName := range awsGlueJobNameList {
 		var awsGlueJobRunToBeMonitored []types2.JobRun
-		currentGlueJobAllRuns, err := awsGlueClient.GetJobRuns(ctx, &glue.GetJobRunsInput{JobName: aws.String(awsGlueJobName)})
+		currentGlueJobAllRuns, err := getAllRunsOfTheCurrentJob(ctx, awsGlueClient, awsGlueJobName)
 		errorMessage = err
 		if errorMessage == nil && currentGlueJobAllRuns != nil {
 			currentTime := time.Now()
 			nineHundredSecondsAgoTime := currentTime.Add(-900 * time.Second)
-			for _, currentAwsGlueJobRun := range currentGlueJobAllRuns.JobRuns {
+			for _, currentAwsGlueJobRun := range currentGlueJobAllRuns {
 				if (currentAwsGlueJobRun.CompletedOn == nil && isTheAWSGlueJobRunActive(currentAwsGlueJobRun.JobRunState)) || (currentAwsGlueJobRun.
 					CompletedOn != nil && currentAwsGlueJobRun.CompletedOn.Compare(nineHundredSecondsAgoTime) >= 0) {
 					awsGlueJobRunToBeMonitored = append(awsGlueJobRunToBeMonitored, currentAwsGlueJobRun)
@@ -149,6 +151,23 @@ func findTheEligibleCurrentAwsGlueJobRunsToMonitor(ctx context.Context, awsGlueC
 		}
 	}
 	return awsGluejobNameAndEligibleJobRunsMap, errorMessage
+}
+
+func getAllRunsOfTheCurrentJob(ctx context.Context, awsGlueClient *glue.Client, awsGlueJobName string) ([]types2.JobRun, error) {
+	var currentGlueJobRuns []types2.JobRun
+	awsGlueJobRunsPaginator := glue.NewGetJobRunsPaginator(awsGlueClient, &glue.GetJobRunsInput{
+		JobName: aws.String(awsGlueJobName),
+	})
+	for awsGlueJobRunsPaginator.HasMorePages() {
+		output, err := awsGlueJobRunsPaginator.NextPage(ctx)
+		if err != nil {
+			return currentGlueJobRuns, fmt.Errorf("failed to get job runs: %v", err)
+		}
+		for _, run := range output.JobRuns {
+			currentGlueJobRuns = append(currentGlueJobRuns, run)
+		}
+	}
+	return currentGlueJobRuns, nil
 }
 
 func prepareTheListOfEachAwsGlueJobRunCustomMetricsAndPublishSequentially(ctx context.Context, awsGlueClient *glue.Client, awsCloudWatchClient *cloudwatch.Client,
@@ -196,10 +215,10 @@ func prepareTheListOfEachAwsGlueJobRunCustomMetricsAndPublishSequentially(ctx co
 	return "Glue Job Run Custom Metrics Published", nil
 }
 
-func computeAwsGlueJobRunsAverageExecutionDuration(currentGlueJobAllRuns *glue.GetJobRunsOutput, currentGlueJobTotalRunCount int) int32 {
+func computeAwsGlueJobRunsAverageExecutionDuration(currentGlueJobAllRuns []types2.JobRun, currentGlueJobTotalRunCount int) int32 {
 	var sumOfExecutionDurationOfAllJobRuns int32
 	var awsGlueJobAverageExecutionDurationSec int32
-	for _, jobRunDetails := range currentGlueJobAllRuns.JobRuns {
+	for _, jobRunDetails := range currentGlueJobAllRuns {
 		sumOfExecutionDurationOfAllJobRuns += jobRunDetails.ExecutionTime
 	}
 	awsGlueJobAverageExecutionDurationSec = (sumOfExecutionDurationOfAllJobRuns) / (int32(currentGlueJobTotalRunCount))
@@ -287,8 +306,8 @@ func constructGlueCustomMetricMetadataAndPublish(ctx context.Context, awsGlueJob
 			Dimensions: []types.Dimension{
 				{Name: aws.String("JobName"), Value: aws.String(awsGlueJobName)},
 				{Name: aws.String("JobRunId"), Value: aws.String(awsGlueJobRunId)},
-				{Name: aws.String("Error Message"), Value: aws.String(*awsGlueJobRunErrorMessage)},
-				{Name: aws.String("namespace"), Value: aws.String("Glue")},
+				{Name: aws.String("ErrorMessage"), Value: aws.String(*awsGlueJobRunErrorMessage)},
+				{Name: aws.String("Namespace"), Value: aws.String("Glue")},
 			},
 		})
 
